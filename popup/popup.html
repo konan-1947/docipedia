@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Docipedia</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+
+<body>
+    <div id="apiKeyView" class="view">
+        <h3>Chào mừng đến Docipedia!</h3>
+        <p>Vui lòng nhập Gemini API Key của bạn để bắt đầu.</p>
+        <input type="password" id="apiKeyInput" placeholder="Dán API Key vào đây...">
+        <button id="saveApiKeyBtn">Lưu & Kích hoạt</button>
+        <a href="https://aistudio.google.com/app/apikey" target="_blank" class="help-link">Lấy API Key ở đâu?</a>
+    </div>
+
+    <div id="mainActionView" class="view" style="display: none;">
+        <h3>Docipedia đã sẵn sàng!</h3>
+        <button id="analyzeBtn">Phân tích trang này</button>
+        <button id="changeApiKeyBtn" class="secondary-btn">Thay đổi API Key</button>
+    </div>
+
+    <!-- loadingView sẽ không được sử dụng trong luồng mới này -->
+    <div id="loadingView" class="view" style="display: none;">
+        <div class="spinner"></div>
+        <p>Đang xử lý...</p>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+
+</html>
