@@ -3,8 +3,6 @@ if (typeof window.docipedia_injected === 'undefined') {
     window.docipedia_injected = true;
 
     chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-
-        // Trả lời yêu cầu lấy nội dung
         if (message.type === 'GET_PAGE_CONTENT') {
             try {
                 const content = extractCleanedBodyText();
@@ -12,25 +10,25 @@ if (typeof window.docipedia_injected === 'undefined') {
             } catch (e) {
                 sendResponse({ text: null });
             }
-            return true; // Báo hiệu trả lời bất đồng bộ
+            return true;
         }
 
-        // Thực hiện lệnh highlight
         if (message.type === 'HIGHLIGHT_TERMS') {
             try {
                 highlightAndAttachTooltips(message.data);
-                sendResponse({ status: 'ok' }); // Gửi lại một xác nhận đơn giản
+                sendResponse({ status: 'ok' });
             } catch (e) {
                 console.error("[Docipedia-CS] Highlighting failed:", e);
                 sendResponse({ status: 'error', error: e.message });
             }
-            return true; // Báo hiệu trả lời bất đồng bộ
+            return true;
+        }
+
+        if (message.type === 'API_ERROR') {
+            alert(`Docipedia Error: ${message.error}`);
         }
     });
 
-    /**
-     * Trích xuất văn bản từ <body> đã được dọn dẹp.
-     */
     function extractCleanedBodyText() {
         try {
             const bodyClone = document.body.cloneNode(true);
@@ -42,9 +40,6 @@ if (typeof window.docipedia_injected === 'undefined') {
         } catch (e) { return null; }
     }
 
-    /**
-     * Tìm kiếm, bọc lại các thuật ngữ và gắn tooltip.
-     */
     function highlightAndAttachTooltips(termsData) {
         if (!termsData || !Array.isArray(termsData) || termsData.length === 0) {
             console.warn("Docipedia: Không có thuật ngữ nào để highlight.");
@@ -59,7 +54,6 @@ if (typeof window.docipedia_injected === 'undefined') {
 
         findAndReplaceDOMText(document.body, { find: regex, wrap: 'span', wrapClass: 'docipedia-term' });
 
-        // Tạo tooltip duy nhất nếu chưa có
         let tooltip = document.getElementById('docipedia-custom-tooltip');
         if (!tooltip) {
             tooltip = document.createElement('div');
@@ -68,7 +62,6 @@ if (typeof window.docipedia_injected === 'undefined') {
         }
         tooltip.className = 'docipedia-tooltip-hidden';
 
-        // Tiêm CSS nếu chưa có
         const styleId = 'docipedia-styles';
         if (!document.getElementById(styleId)) {
             const style = document.createElement('style');
@@ -86,7 +79,6 @@ if (typeof window.docipedia_injected === 'undefined') {
             document.head.appendChild(style);
         }
 
-        // Gắn các sự kiện (dùng event delegation)
         let hoverTimeout;
         document.body.addEventListener('mouseover', (event) => {
             const target = event.target;
