@@ -9,7 +9,7 @@ async function fetchFromGemini(text, apiKey) {
     const MODEL_NAME = "gemini-2.5-pro";
     const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${apiKey}`;
     const prompt = `Bạn là "Docipedia AI", một chuyên gia phân tích văn bản và giải thích các khái niệm phức tạp BẰNG TIẾNG VIỆT. Nhiệm vụ của bạn là đọc kỹ văn bản dưới đây và thực hiện các yêu cầu sau:
-1.  **Xác định thuật ngữ:** Phân tích và xác định tối đa 15 thuật ngữ, từ viết tắt, hoặc khái niệm cốt lõi quan trọng nhất bằng tiếng Anh hoặc ngôn ngữ gốc của văn bản.
+1.  **Xác định thuật ngữ:** Phân tích và xác định các thuật ngữ, từ viết tắt, hoặc khái niệm cốt lõi quan trọng nhất bằng tiếng Anh hoặc ngôn ngữ gốc của văn bản.
 2.  **Tạo giải thích đa cấp BẰNG TIẾNG VIỆT:** Với MỖI thuật ngữ, tạo 3 cấp độ giải thích sau: \`summary\` (1 câu), \`contextual_explanation\` (1-2 câu trong ngữ cảnh), \`deep_dive\` (3-5 câu chi tiết).
 3.  **Định dạng đầu ra:** Trả về kết quả dưới dạng một MẢNG JSON hợp lệ. Key \`term\` phải giữ nguyên thuật ngữ gốc.
 QUAN TRỌNG: Phản hồi của bạn CHỈ được chứa mảng JSON này và không có bất kỳ văn bản nào khác.
