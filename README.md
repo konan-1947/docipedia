@@ -1,61 +1,45 @@
-# Docipedia
+# Docipedia - Trình Giải Thích Thuật Ngữ Theo Ngữ Cảnh
 
+**Docipedia** là một Tiện ích mở rộng (Extension) cho Google Chrome, khai thác Google Gemini API để cung cấp các giải thích theo yêu cầu và nhận biết ngữ cảnh cho các thuật ngữ kỹ thuật và khái niệm phức tạp trực tiếp trên mọi trang web. Tiện ích được thiết kế để tối ưu hóa quy trình làm việc của lập trình viên, nhà nghiên cứu và các chuyên gia bằng cách loại bỏ nhu cầu chuyển đổi ngữ cảnh (context-switching) để tra cứu định nghĩa.
 
-**Docipedia** là một tiện ích mở rộng cho Google Chrome, sử dụng sức mạnh của Google Gemini AI để biến mọi tài liệu, bài viết, hay trang web phức tạp thành một cuốn bách khoa toàn thư tương tác.
+[![Watch the video](https://img.youtube.com/vi/eVGxqiJbAOM/0.jpg)](https://www.youtube.com/watch?v=eVGxqiJbAOM)
 
-Thay vì phải liên tục chuyển tab để tìm kiếm các thuật ngữ khó hiểu, Docipedia sẽ tự động tìm, đánh dấu và giải thích chúng ngay trong ngữ cảnh của bài viết, giúp bạn đọc nhanh hơn và hiểu sâu hơn.
+## Chức Năng Cốt Lõi
 
+- **Đánh Dấu Thuật Ngữ Động (Dynamic Term Highlighting):** Sử dụng `findAndReplaceDOMText` để "bọc" các thuật ngữ được xác định một cách an toàn bên trong DOM của trang mà không làm hỏng các event listener hiện có hoặc Virtual DOM của các framework SPA.
+- **Phân Tích Bằng AI Theo Ngữ Cảnh:** Gửi nội dung văn bản chính của trang web đến Gemini API (model `gemini-pro`) để phân tích. Prompt được thiết kế chuyên biệt (engineered) để trích xuất các thuật ngữ chính và tạo ra các giải thích đa cấp (tóm tắt, giải thích theo ngữ cảnh, và phân tích sâu).
+- **Xử Lý Có Trạng Thái (Stateful Processing):** Service Worker ở background duy trì trạng thái xử lý cho mỗi tab, ngăn chặn các lệnh gọi API trùng lặp và đảm bảo trải nghiệm người dùng nhất quán ngay cả khi popup được đóng và mở lại trong quá trình hoạt động.
+- **Tùy Chỉnh Hành Vi AI:** (đang lười chưa làm) Người dùng có thể sửa đổi prompt hệ thống được gửi đến Gemini API thông qua cài đặt của tiện ích, cho phép tinh chỉnh phân tích dựa trên lĩnh vực chuyên môn cụ thể của họ (ví dụ: pháp lý, y tế, kỹ thuật phần mềm).
+- **Xử Lý API Key An Toàn:** API Key do người dùng cung cấp được lưu trữ an toàn bằng `chrome.storage.sync`, đảm bảo chúng được cô lập khỏi content script và các trang web đang duyệt.
 
-[![Xem video](https://img.youtube.com/vi/none/0.jpg)](overview.mp4)
+## Kiến Trúc Kỹ Thuật
 
+- **Nền tảng:** Manifest V3
+- **Logic lõi:** JavaScript (ES6+), Lập trình bất đồng bộ (Promises, async/await)
+- **Background Script (`service_worker`):** Điều phối toàn bộ quy trình, quản lý trạng thái, xử lý tất cả giao tiếp với API và cập nhật Action Badge để phản ánh trạng thái hiện tại (đang xử lý, thành công, lỗi).
+- **Content Script:** Chịu trách nhiệm tương tác với DOM, bao gồm trích xuất nội dung văn bản và áp dụng các đánh dấu dựa trên dữ liệu nhận được từ background script.
+- **Popup UI:** Đóng vai trò là giao diện người dùng chính để khởi tạo phân tích, quản lý API Key và tùy chỉnh prompt. Nó giao tiếp với background script để lấy trạng thái thời gian thực của các tác vụ đang chạy.
 
-## ✨ Tính Năng Nổi Bật
+## Cài Đặt và Sử Dụng
 
-- **Giải Thích Tự Động:** Tự động quét và xác định các thuật ngữ chuyên ngành, từ viết tắt, hoặc các khái niệm phức tạp trong trang web.
-- **Ngữ Cảnh là Vua:** Cung cấp định nghĩa và giải thích được "may đo" riêng cho ngữ cảnh của tài liệu bạn đang đọc, thay vì các định nghĩa chung chung.
-- **Giao Diện Trực Quan:** Các thuật ngữ được đánh dấu tinh tế. Chỉ cần di chuột qua để xem tóm tắt hoặc nhấp chuột để xem giải thích chi tiết.
-- **Hỗ Trợ Tiếng Việt:** Toàn bộ phần giải thích được trả về bằng tiếng Việt, giúp phá vỡ rào cản ngôn ngữ.
-- **Tùy Chỉnh Linh Hoạt:** Cho phép người dùng tùy chỉnh "bộ não" của AI bằng cách sửa đổi prompt hệ thống trực tiếp trong tiện ích.
-- **Bảo Mật:** API Key của bạn được lưu trữ an toàn và chỉ được sử dụng để giao tiếp với Google, không được gửi đi bất cứ nơi nào khác.
+### 1. Cài Đặt
 
-## 🚀 Cài Đặt & Sử Dụng
+1.  Sao chép (clone) hoặc tải về toàn bộ repository này.
+2.  Truy cập `chrome://extensions` trên trình duyệt Google Chrome.
+3.  Bật **"Chế độ dành cho nhà phát triển" (Developer mode)**.
+4.  Nhấp vào **"Tải tiện ích đã giải nén" (Load unpacked)** và chọn thư mục dự án.
 
-### Cài Đặt
+### 2. Cấu Hình
 
-1.  Tải về toàn bộ mã nguồn của dự án này dưới dạng file `.zip`.
-2.  Mở trình duyệt Google Chrome, truy cập vào địa chỉ `chrome://extensions`.
-3.  Bật **"Chế độ dành cho nhà phát triển" (Developer mode)** ở góc trên bên phải.
-4.  Nhấp vào nút **"Tải tiện ích đã giải nén" (Load unpacked)**.
-5.  Chọn thư mục dự án mà bạn đã giải nén. Tiện ích Docipedia sẽ xuất hiện trong danh sách.
+1.  Nhấp vào biểu tượng Docipedia trên thanh công cụ của Chrome.
+2.  Bạn sẽ được yêu cầu nhập **Google Gemini API Key**.
+3.  Tạo một khóa API mới từ [Google AI Studio](https://aistudio.google.com/app/apikey) và dán vào trường nhập liệu.
 
-### Sử Dụng
+### 3. Vận Hành
 
-1.  **Thiết lập API Key:**
-    *   Lần đầu tiên sử dụng, hãy nhấp vào biểu tượng Docipedia trên thanh công cụ.
-    *   Bạn sẽ được yêu cầu nhập **Google Gemini API Key**.
-    *   Để lấy key, hãy truy cập [Google AI Studio](https://aistudio.google.com/app/apikey), tạo một API key mới và dán vào tiện ích.
-    *   Nhấn "Lưu & Kích hoạt".
+1.  Truy cập một trang web chứa tài liệu kỹ thuật hoặc văn bản phức tạp.
+2.  Nhấp vào biểu tượng Docipedia, sau đó nhấp vào "Phân tích trang này".
+3.  Badge trên biểu tượng của tiện ích sẽ cập nhật thành `...` để báo hiệu đang xử lý.
+4.  Khi hoàn tất, các thuật ngữ liên quan trên trang sẽ được đánh dấu. Di chuột qua một thuật ngữ để xem tóm tắt nhanh hoặc nhấp chuột để xem giải thích chi tiết.
 
-2.  **Phân Tích Trang Web:**
-    *   Truy cập bất kỳ trang web nào có nội dung bạn muốn tìm hiểu.
-    *   Nhấp vào biểu tượng Docipedia.
-    *   Nhấn nút **"Phân tích trang này"**.
-    *   Biểu tượng của tiện ích sẽ hiển thị trạng thái xử lý (`...`).
-    *   Khi hoàn tất, các thuật ngữ trên trang sẽ được tự động gạch chân chấm chấm.
-
-3.  **Tra Cứu:**
-    *   **Xem nhanh:** Di chuột (hover) qua một từ được gạch chân để xem tóm tắt và giải thích ngắn gọn.
-    *   **Xem chi tiết:** Nhấp chuột (click) vào từ đó để xem giải thích sâu hơn trong một cửa sổ `alert`.
-
-4.  **Tùy Chỉnh Prompt (Nâng cao):**
-    *   (đang lười chưa làm)
-
-
-
-## 🛠️ Công Nghệ Sử Dụng
-
-- **Nền tảng:** Google Chrome Extension Manifest V3
-- **Ngôn ngữ:** HTML, CSS, JavaScript (ES6+)
-- **API:** Google Gemini API
-- **Thư viện:** `findAndReplaceDOMText` (để bọc văn bản một cách an toàn)
 
